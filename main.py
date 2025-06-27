@@ -1,3 +1,5 @@
+from telegram import InputFile
+
 from flask import Flask
 from threading import Thread
 
@@ -142,6 +144,20 @@ async def report(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"💡 Lazy Spending Rate: {lazy_rate}%"
     )
 
+async def send_csv(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    username = f"@{update.effective_user.username}"
+
+    if username != "@Rustamboyev_B":
+        await update.message.reply_text("🚫 You’re not authorized to access this file.")
+        return
+
+    try:
+        with open("log.csv", "rb") as file:
+            await update.message.reply_document(InputFile(file), filename="log.csv")
+    except FileNotFoundError:
+        await update.message.reply_text("⚠️ log.csv not found.")
+
+
 # ========== MAIN APP ========== #
 if __name__ == "__main__":
     TOKEN = os.getenv("BOT_TOKEN")
@@ -155,6 +171,8 @@ if __name__ == "__main__":
 
     app.add_handler(conv_handler)
     app.add_handler(CommandHandler("report", report))
+    app.add_handler(CommandHandler("getcsv", send_csv))
+
 
     print("✅ HabitHack is running...")
     keep_alive()
