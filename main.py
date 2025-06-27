@@ -1,3 +1,5 @@
+import pandas as pd
+
 from telegram import InputFile
 
 from flask import Flask
@@ -157,6 +159,33 @@ async def send_csv(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except FileNotFoundError:
         await update.message.reply_text("⚠️ log.csv not found.")
 
+async def send_summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    username = f"@{update.effective_user.username}"
+
+    try:
+        df = pd.read_csv("log.csv")
+        user_df = df[df["username"] == username]
+
+        if user_df.empty:
+            await update.message.reply_text("🙁 You haven’t logged any actions yet.")
+            return
+
+        total_actions = len(user_df)
+        total_score = user_df["score"].sum()
+        action_counts = user_df["action"].value_counts()
+
+        summary = f"📊 *Your Summary*\n\n"
+        summary += f"👤 User: {username}\n"
+        summary += f"🗓️ Actions Logged: {total_actions}\n"
+        summary += f"💸 Laziness Score: {total_score}\n\n"
+
+        for action, count in action_counts.items():
+            summary += f"• {action}: {count}x\n"
+
+        await update.message.reply_text(summary, parse_mode="Markdown")
+
+    except FileNotFoundError:
+        await update.message.reply_text("⚠️ No log found. Start using the bot to generate data.")
 
 # ========== MAIN APP ========== #
 if __name__ == "__main__":
@@ -172,6 +201,8 @@ if __name__ == "__main__":
     app.add_handler(conv_handler)
     app.add_handler(CommandHandler("report", report))
     app.add_handler(CommandHandler("getcsv", send_csv))
+    app.add_handler(CommandHandler("summary", send_summary))
+
 
 
     print("✅ HabitHack is running...")
