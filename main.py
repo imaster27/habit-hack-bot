@@ -196,7 +196,7 @@ import asyncio
 
 async def start_bot():
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(send_daily_reminder, 'interval', seconds=60)
+    scheduler.add_job(send_daily_reminder, 'cron', hour=20, minute=0)
     scheduler.start()
 
     keep_alive()
