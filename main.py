@@ -227,6 +227,8 @@ def get_all_users():
 
 # ========== MAIN APP ========== #
 if __name__ == "__main__":
+    print("✅ HabitHack is starting...")
+
     TOKEN = os.getenv("BOT_TOKEN")
     app = ApplicationBuilder().token(TOKEN).build()
 
@@ -245,7 +247,6 @@ if __name__ == "__main__":
     scheduler.add_job(send_daily_reminder, 'interval', seconds=60)
     scheduler.start()
 
-    print("✅ HabitHack is running...")
     keep_alive()
-
     app.run_polling()
+
