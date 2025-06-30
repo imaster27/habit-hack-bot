@@ -1,6 +1,5 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from telegram import Update
-from telegram.ext import CommandHandler, ContextTypes
+from telegram.ext import ContextTypes
 import os
 
 import pandas as pd
@@ -67,8 +66,8 @@ if not os.path.exists(DATA_FILE):
 
 # ========== START COMMAND ========== #
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    save_user_id(update.effective_chat.id)  # ✅ Add this line to collect user ID
-    
+    save_user_id(update.effective_chat.id)
+
     keyboard = [["🚕 Taxi", "🍔 Food Delivery", "🙌 No Spending Today"]]
     reply_markup = ReplyKeyboardMarkup(keyboard, one_time_keyboard=True, resize_keyboard=True)
     await update.message.reply_text(
@@ -76,6 +75,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=reply_markup
     )
     return CHOOSING
+
 
 # ========== LOG SPENDING ========== #
 async def log_spending(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -194,6 +194,8 @@ async def send_summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except FileNotFoundError:
         await update.message.reply_text("⚠️ No log found. Start using the bot to generate data.")
 
+from telegram.ext import ContextTypes
+
 async def send_daily_reminder(context: ContextTypes.DEFAULT_TYPE):
     user_ids = get_all_users()
     for chat_id in user_ids:
@@ -201,6 +203,8 @@ async def send_daily_reminder(context: ContextTypes.DEFAULT_TYPE):
             await context.bot.send_message(chat_id=chat_id, text="📅 Don’t forget to log your spending today in HabitHack!")
         except Exception as e:
             print(f"❌ Failed to send reminder to {chat_id}: {e}")
+
+
 
 # Save user chat ID to a text file
 def save_user_id(chat_id):
@@ -213,13 +217,13 @@ def save_user_id(chat_id):
             if str(chat_id) not in ids:
                 f.write(str(chat_id) + "\n")
 
-# Load all saved user IDs
 def get_all_users():
     try:
         with open("users.txt", "r") as f:
             return list(set(int(line.strip()) for line in f))
     except FileNotFoundError:
         return []
+
 
 # ========== MAIN APP ========== #
 if __name__ == "__main__":
@@ -237,13 +241,12 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("getcsv", send_csv))
     app.add_handler(CommandHandler("summary", send_summary))
 
+    scheduler = AsyncIOScheduler()
+sscheduler.add_job(send_daily_reminder, 'interval', seconds=60)  # Sends every day at 8 PM
+scheduler.start()
 
 
     print("✅ HabitHack is running...")
     keep_alive()
 
     app.run_polling()
-
-scheduler = AsyncIOScheduler()
-scheduler.add_job(send_daily_reminder, 'interval', seconds=60, args=[app])  # Sends at 20:00 = 8:00 PM
-scheduler.start()
