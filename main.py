@@ -242,9 +242,8 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("summary", send_summary))
 
     scheduler = AsyncIOScheduler()
-sscheduler.add_job(send_daily_reminder, 'interval', seconds=60)  # Sends every day at 8 PM
-scheduler.start()
-
+    scheduler.add_job(send_daily_reminder, 'interval', seconds=60)
+    scheduler.start()
 
     print("✅ HabitHack is running...")
     keep_alive()
