@@ -245,5 +245,5 @@ if __name__ == "__main__":
     app.run_polling()
 
 scheduler = AsyncIOScheduler()
-scheduler.add_job(send_daily_reminder, 'cron', hour=20, minute=0, args=[app])  # Sends at 20:00 = 8:00 PM
+scheduler.add_job(send_daily_reminder, 'interval', seconds=60, args=[app])  # Sends at 20:00 = 8:00 PM
 scheduler.start()
