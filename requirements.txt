@@ -8,3 +8,5 @@ telegram
 
 flask
 pandas
+
+apscheduler
