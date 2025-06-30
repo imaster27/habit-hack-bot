@@ -181,14 +181,15 @@ async def send_summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except FileNotFoundError:
         await update.message.reply_text("⚠️ No log found. Start using the bot to generate data.")
 
-async def send_daily_reminder(context: ContextTypes.DEFAULT_TYPE):
-    print("📅 Reminder job triggered.")  # ✅ Add this
+async def send_daily_reminder():
+    print("📅 Reminder triggered.")
     user_ids = get_all_users()
     for chat_id in user_ids:
         try:
-            await context.bot.send_message(chat_id=chat_id, text="📅 Don’t forget to log your spending today in HabitHack!")
+            await app.bot.send_message(chat_id=chat_id, text="📅 Don’t forget to log your spending today in HabitHack!")
         except Exception as e:
             print(f"❌ Failed to send reminder to {chat_id}: {e}")
+
 
 
 # ========== MAIN ==========
