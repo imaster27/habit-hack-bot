@@ -1,12 +1,6 @@
 python-telegram-bot==20.3
 python-dotenv
-
 matplotlib
-telegram
-
-
-
 flask
 pandas
-
 apscheduler
