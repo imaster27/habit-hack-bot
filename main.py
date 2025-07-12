@@ -18,7 +18,6 @@ from telegram.ext import (
     ConversationHandler
 )
 
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from dotenv import load_dotenv
 
 # ========== SETUP ==========
@@ -181,30 +180,10 @@ async def send_summary(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except FileNotFoundError:
         await update.message.reply_text("⚠️ No log found. Start using the bot to generate data.")
 
-async def send_daily_reminder():
-    print("📅 Reminder triggered.")
-    user_ids = get_all_users()
-    for chat_id in user_ids:
-        try:
-            await app.bot.send_message(chat_id=chat_id, text="📅 Don’t forget to log your spending today in HabitHack!")
-        except Exception as e:
-            print(f"❌ Failed to send reminder to {chat_id}: {e}")
-
-
-
 # ========== MAIN ==========
-import asyncio
-
-async def start_bot():
-    scheduler = AsyncIOScheduler()
-    scheduler.add_job(send_daily_reminder, 'cron', hour=20, minute=0)
-    scheduler.start()
-
-    keep_alive()
-    await app.run_polling()
-
 if __name__ == "__main__":
     print("✅ HabitHack is starting...")
+
     TOKEN = os.getenv("BOT_TOKEN")
     app = ApplicationBuilder().token(TOKEN).build()
 
@@ -219,5 +198,5 @@ if __name__ == "__main__":
     app.add_handler(CommandHandler("getcsv", send_csv))
     app.add_handler(CommandHandler("summary", send_summary))
 
-    asyncio.run(start_bot())
-
+    keep_alive()
+    app.run_polling()
